@@ -122,3 +122,62 @@ extension ViewController {
     }
     
 }
+
+extension ViewController {
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [weak self] (action, _, complition) in
+            self?.showDeleteAlert(at: indexPath)
+        }
+        
+        let updateAction = UIContextualAction(style: .normal, title: "update") { [weak self] (action, _, complition) in
+            self?.showUpdateAlert(at: indexPath)
+        }
+        updateAction.backgroundColor = .blue
+        
+        let swipeConfiguration = UISwipeActionsConfiguration(actions: [deleteAction, updateAction])
+        swipeConfiguration.performsFirstActionWithFullSwipe = false
+        return swipeConfiguration
+    }
+    
+    func showDeleteAlert(at indexPath : IndexPath){
+        let alert = UIAlertController(title: "Delete Item", message: "Are you sure to delete this row", preferredStyle: .alert)
+        let cancelBtn = UIAlertAction(title: "Cancle", style: .cancel)
+        let okBtn = UIAlertAction(title: "Ok", style: .destructive) { [weak self] action in
+            self?.deleteItem(at: indexPath)
+        }
+        
+        alert.addAction(cancelBtn)
+        alert.addAction(okBtn)
+        
+        present(alert, animated: false)
+    }
+    
+    func deleteItem(at indexPath: IndexPath){
+        stateTableView.beginUpdates()
+        statesWithSection[indexPath.section].stateNames.remove(at: indexPath.row)
+        stateTableView.deleteRows(at: [indexPath], with: .automatic)
+        stateTableView.endUpdates()
+    }
+    
+    func showUpdateAlert(at indexPath: IndexPath){
+        let alert = UIAlertController(title: "UpdateItem", message: "Enter new item here", preferredStyle: .alert)
+        alert.addTextField { textField in
+            textField.placeholder = "enter here....."
+        }
+        
+        let cancelBtn = UIAlertAction(title: "Cancel", style: .cancel)
+        
+        let okBtn = UIAlertAction(title: "OK", style: .default) { [weak self] action in
+            if let alertTextField = alert.textFields?.first , let newValue = alertTextField.text {
+                self?.statesWithSection[indexPath.section].stateNames[indexPath.row] = newValue
+                self?.stateTableView.reloadRows(at: [indexPath], with: .automatic)
+                
+            }
+        }
+        
+        alert.addAction(cancelBtn)
+        alert.addAction(okBtn)
+        present(alert, animated: true)
+    }
+    
+}

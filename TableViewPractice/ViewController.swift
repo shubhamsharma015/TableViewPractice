@@ -181,3 +181,19 @@ extension ViewController {
     }
     
 }
+
+extension ViewController{
+    func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        return UIContextMenuConfiguration(identifier: nil,previewProvider: nil) { action in
+            let deleteAction = UIAction(title: NSLocalizedString("Delete", comment: ""),image: UIImage(systemName: "trash"),attributes: .destructive) { [weak self] _ in
+                self?.deleteItem(at: indexPath)
+            }
+            
+            let copyAction = UIAction(title: "Copy",image: UIImage(systemName: "doc.on.doc")) { _ in
+                let textToCopy = self.statesWithSection[indexPath.section].stateNames[indexPath.row]
+                UIPasteboard.general.string = textToCopy
+            }
+            return UIMenu(children: [deleteAction,copyAction])
+        }
+    }
+}
